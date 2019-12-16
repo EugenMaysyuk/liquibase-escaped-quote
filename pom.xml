@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.may</groupId>
+    <artifactId>liquibase-escaped-quote</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>liquibase-escaped-quote</name>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <version.liquibase>3.8.2</version.liquibase>
+<!--        <version.liquibase>3.4.2</version.liquibase>-->
+        <version.mysql-connector-java>8.0.15</version.mysql-connector-java>
+        <db.username>root</db.username>
+        <db.password>master</db.password>
+        <db.host>127.0.0.1</db.host>
+        <db.port>3306</db.port>
+        <db.catalog>test</db.catalog>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${version.liquibase}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${version.mysql-connector-java}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>
+                    <version>1.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>mysql</groupId>
+                            <artifactId>mysql-connector-java</artifactId>
+                            <version>${version.mysql-connector-java}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <driver>com.mysql.jdbc.Driver</driver>
+                        <url>jdbc:mysql://${db.host}:${db.port}</url>
+                        <username>${db.username}</username>
+                        <password>${db.password}</password>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.liquibase</groupId>
+                    <artifactId>liquibase-maven-plugin</artifactId>
+                    <version>${version.liquibase}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                            <version>2.3.1</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>drop-db</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <forceMojoExecution>true</forceMojoExecution>
+                            <sqlCommand>DROP DATABASE IF EXISTS `${db.catalog}`;</sqlCommand>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-db</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <forceMojoExecution>true</forceMojoExecution>
+                            <sqlCommand>CREATE DATABASE `${db.catalog}`;</sqlCommand>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <configuration>
+                    <changeLogFile>master.xml</changeLogFile>
+                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                    <driver>com.mysql.jdbc.Driver</driver>
+                    <url>jdbc:mysql://${db.host}:${db.port}/${db.catalog}</url>
+                    <username>${db.username}</username>
+                    <password>${db.password}</password>
+                    <verbose>true</verbose>
+                    <dropFirst>false</dropFirst>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>upgrade</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
