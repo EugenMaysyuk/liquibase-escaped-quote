@@ -11,7 +11,7 @@
         <java.version>1.8</java.version>
         <version.liquibase>3.8.2</version.liquibase>
 <!--        <version.liquibase>3.4.2</version.liquibase>-->
-        <version.mysql-connector-java>8.0.15</version.mysql-connector-java>
+        <version.mysql-connector-java>8.0.16</version.mysql-connector-java>
         <db.username>root</db.username>
         <db.password>master</db.password>
         <db.host>127.0.0.1</db.host>
